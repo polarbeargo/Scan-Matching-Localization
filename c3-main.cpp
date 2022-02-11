@@ -207,11 +207,12 @@ int main(){
 			vg.setLeafSize(resolution, resolution, resolution);
 			typename pcl::PointCloud<PointT>::Ptr ProcessPointClouds<PointT>::FilterCloud(typename pcl::PointCloud<PointT>::Ptr cloud, float resolution, Eigen::Vector4f minPoint, Eigen::Vector4f maxPoint)
 			vg.filter(*FilterCloud);
-			// TODO: Find pose transform by using ICP or NDT matching
-			//pose = ....
-			
-			// TODO: Transform scan so it aligns with ego's actual pose and render that scan
 
+			// Find pose transform by using ICP or NDT matching
+			Eigen::Matrix4d pos_transform = ICP(mapCloud, FilterCloud, pose);
+			pose = getPose(pos_transform);
+			// TODO: Transform scan so it aligns with ego's actual pose and render that scan
+			
 			viewer->removePointCloud("scan");
 			// TODO: Change `scanCloud` below to your transformed scan
 			renderPointCloud(viewer, scanCloud, "scan", Color(1,0,0) );
