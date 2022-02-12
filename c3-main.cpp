@@ -211,10 +211,13 @@ int main(){
 			// Find pose transform by using ICP or NDT matching
 			Eigen::Matrix4d pos_transform = ICP(mapCloud, FilterCloud, pose);
 			pose = getPose(pos_transform);
-			// TODO: Transform scan so it aligns with ego's actual pose and render that scan
 			
+			// Transform scan so it aligns with ego's actual pose and render that scan
+			PointCloudT::Ptr corrected(new PointCloudT);
+			pcl::transformPointCloud(*cloudFiltered, *corrected, match_transform);
 			viewer->removePointCloud("scan");
-			// TODO: Change `scanCloud` below to your transformed scan
+
+			// Change `scanCloud` below to your transformed scan
 			renderPointCloud(viewer, scanCloud, "scan", Color(1,0,0) );
 
 			viewer->removeAllShapes();
