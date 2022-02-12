@@ -200,6 +200,7 @@ int main(){
 		if(!new_scan){
 			
 			new_scan = true;
+
 			// Filter scan using voxel filter
 			double resolution = 0.5;
 			pcl::VoxelGrid<PointT> vg;
@@ -211,10 +212,10 @@ int main(){
 			// Find pose transform by using ICP or NDT matching
 			Eigen::Matrix4d pos_transform = ICP(mapCloud, FilterCloud, pose);
 			pose = getPose(pos_transform);
-			
+
 			// Transform scan so it aligns with ego's actual pose and render that scan
 			PointCloudT::Ptr corrected(new PointCloudT);
-			pcl::transformPointCloud(*cloudFiltered, *corrected, match_transform);
+			pcl::transformPointCloud(*FilterCloud, *corrected, pos_transform);
 			viewer->removePointCloud("scan");
 
 			// Change `scanCloud` below to your transformed scan
