@@ -238,16 +238,16 @@ int main(){
 			pcl::VoxelGrid<PointT> vg;
 			vg.setInputCloud(scanCloud);
 			vg.setLeafSize(resolution, resolution, resolution);
-			typename pcl::PointCloud<PointT>::Ptr ProcessPointClouds<PointT>::FilterCloud(typename pcl::PointCloud<PointT>::Ptr cloud, float resolution, Eigen::Vector4f minPoint, Eigen::Vector4f maxPoint)
+			typename pcl::PointCloud<PointT>::Ptr FilterCloud (new pcl::PointCloud<PointT>);
 			vg.filter(*FilterCloud);
 
 			// Find pose transform by using ICP or NDT matching
-			Eigen::Matrix4d pos_transform = ICP(mapCloud, pclCloud, pose);
+			Eigen::Matrix4d pos_transform = ICP(mapCloud, FilterCloud, pose,20);
 			pose = getPose(pos_transform);
 
 			// Transform scan so it aligns with ego's actual pose and render that scan
 			PointCloudT::Ptr corrected(new PointCloudT);
-			pcl::transformPointCloud(*pclCloud, *corrected, pos_transform);
+			pcl::transformPointCloud(*FilterCloud, *corrected, pos_transform);
 			viewer->removePointCloud("scan");
 
 			// Change `scanCloud` below to your transformed scan
