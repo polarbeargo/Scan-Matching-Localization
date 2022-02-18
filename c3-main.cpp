@@ -145,7 +145,7 @@ Eigen::Matrix4d NDT(pcl::NormalDistributionsTransform<pcl::PointXYZ, pcl::PointX
 	pcl::PointCloud<pcl::PointXYZ>::Ptr cloud_ndt (new pcl::PointCloud<pcl::PointXYZ>);
   	ndt.align (*cloud_ndt, init_guess);
 
-	//cout << "Normal Distributions Transform has converged:" << ndt.hasConverged () << " score: " << ndt.getFitnessScore () <<  " time: " << time.toc() <<  " ms" << endl;
+	cout << "Normal Distributions Transform has converged:" << ndt.hasConverged () << " score: " << ndt.getFitnessScore () <<  " time: " << time.toc() <<  " ms" << endl;
 
 	Eigen::Matrix4d transformation_matrix = ndt.getFinalTransformation ().cast<double>();
 
@@ -153,7 +153,13 @@ Eigen::Matrix4d NDT(pcl::NormalDistributionsTransform<pcl::PointXYZ, pcl::PointX
 
 }
 
-int main(){
+int main(int argc, char *argv[]){
+	
+	int select_ndt = 1;
+    if(argc == 2 && strcmp(argv[1], "2") == 0) 
+		select_ndt = 0;
+
+    printf("\n%s\n\n", select_ndt ? "Using Normal Distributions Transform (NDT)" : "Using Iterative Closest Point (ICP)");
 
 	auto client = cc::Client("localhost", 2000);
 	client.SetTimeout(2s);
@@ -264,7 +270,7 @@ int main(){
 			vg.filter(*FilterCloud);
 
 			// Find pose transform by using ICP or NDT matching
-			Eigen::Matrix4d pos_transform = ICP(mapCloud, FilterCloud, pose,20);
+			Eigen::Matrix4d pos_transform = select_ndt ? NDT(mapCloud, FilterCloud, pose, 20) : ICP(mapCloud, FilterCloud, pose,20);
 			pose = getPose(pos_transform);
 
 			// Transform scan so it aligns with ego's actual pose and render that scan
