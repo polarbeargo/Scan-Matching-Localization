@@ -142,7 +142,7 @@ Eigen::Matrix4d ICP(PointCloudT::Ptr target, PointCloudT::Ptr source, Pose start
 	return transformation_matrix;
 }
 
-Eigen::Matrix4d NDT(pcl::NormalDistributionsTransform<pcl::PointXYZ, pcl::PointXYZ> ndt, PointCloudT::Ptr source, Pose startingPose, int iterations)
+Eigen::Matrix4d NDT(PointCloudT::Ptr mapCloud, PointCloudT::Ptr source, Pose startingPose)
 {
 
 	pcl::console::TicToc time;
@@ -285,7 +285,7 @@ int main(int argc, char *argv[])
 			vg.filter(*FilterCloud);
 
 			// Find pose transform by using ICP or NDT matching
-			Eigen::Matrix4d pos_transform = select_ndt ? NDT(mapCloud, FilterCloud, pose, 20) : ICP(mapCloud, FilterCloud, pose, 20);
+			Eigen::Matrix4d pos_transform = select_ndt ? NDT(mapCloud, FilterCloud, pose) : ICP(mapCloud, FilterCloud, pose, 20);
 			pose = getPose(pos_transform);
 
 			// Transform scan so it aligns with ego's actual pose and render that scan
