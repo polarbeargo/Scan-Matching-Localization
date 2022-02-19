@@ -151,7 +151,8 @@ Eigen::Matrix4d NDT(PointCloudT::Ptr mapCloud, PointCloudT::Ptr source, Pose sta
 	Eigen::Matrix4f init_guess = transform3D(startingPose.rotation.yaw, startingPose.rotation.pitch, startingPose.rotation.roll, startingPose.position.x, startingPose.position.y, startingPose.position.z).cast<float>();
 
 	// Setting max number of registration iterations.
-	ndt.setMaximumIterations(iterations);
+	int max_iterations = 5;
+	ndt.setMaximumIterations(max_iterations);
 	ndt.setInputSource(source);
 
 	pcl::PointCloud<pcl::PointXYZ>::Ptr cloud_ndt(new pcl::PointCloud<pcl::PointXYZ>);
