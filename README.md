@@ -34,5 +34,5 @@ cd /home/workspace
 ```
 cd /home/workspace/
 
-./cloud_loc
+./cloud_loc 2
 ```
