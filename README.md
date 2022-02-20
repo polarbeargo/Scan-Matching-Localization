@@ -34,5 +34,9 @@ cd /home/workspace
 ```
 cd /home/workspace/
 
+Using Normal Distributions Transform (NDT)
+./cloud_loc 
+
+Using Iterative Closest Point (ICP)
 ./cloud_loc 2
 ```
