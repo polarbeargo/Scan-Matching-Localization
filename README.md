@@ -40,3 +40,7 @@ Using Normal Distributions Transform (NDT)
 Using Iterative Closest Point (ICP)
 ./cloud_loc 2
 ```
+## Result
+- Scan Matching Localization with LIDAR Point Clouds - Using Iterative Closest Point (ICP)  
+https://youtu.be/-wIzv20Jrd4    
+[![IMAGE ALT TEXT HERE](./images/ICPTouchDown.png)](https://youtu.be/-wIzv20Jrd4)
