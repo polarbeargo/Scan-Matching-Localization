@@ -142,18 +142,29 @@ Eigen::Matrix4d ICP(PointCloudT::Ptr target, PointCloudT::Ptr source, Pose start
 	return transformation_matrix;
 }
 
-Eigen::Matrix4d NDT(PointCloudT::Ptr target, PointCloudT::Ptr source, Pose startingPose)
+Eigen::Matrix4d NDT(pcl::NormalDistributionsTransform<pcl::PointXYZ, pcl::PointXYZ> ndt, PointCloudT::Ptr source, Pose startingPose)
 {
+	// pcl::NormalDistributionsTransform<pcl::PointXYZ, pcl::PointXYZ> ndt;
+
+	// Setting minimum transformation difference for termination condition.
+	ndt.setTransformationEpsilon(1e-6);
+
+	// Setting maximum step size for More-Thuente line search.
+	// ndt.setStepSize (1);
+
+	// Setting Resolution of NDT grid structure (VoxelGridCovariance).
+	//  ndt.setResolution (1);
+	//  ndt.setInputTarget(target);
 
 	pcl::console::TicToc time;
 	time.tic();
-	pcl::NormalDistributionsTransform<pcl::PointXYZ, pcl::PointXYZ> ndt;
+
 	Eigen::Matrix4f init_guess = transform3D(startingPose.rotation.yaw, startingPose.rotation.pitch, startingPose.rotation.roll, startingPose.position.x, startingPose.position.y, startingPose.position.z).cast<float>();
-	ndt.setTransformationEpsilon(1e-6);
+
+	// ndt.setTransformationEpsilon(0.0000001);
 	// Setting max number of registration iterations.
-	int max_iterations = 5;
+	int max_iterations = 4;
 	ndt.setMaximumIterations(max_iterations);
-	ndt.setInputTarget(target);
 	ndt.setInputSource(source);
 
 	pcl::PointCloud<pcl::PointXYZ>::Ptr cloud_ndt(new pcl::PointCloud<pcl::PointXYZ>);
@@ -279,7 +290,7 @@ int main(int argc, char *argv[])
 			new_scan = true;
 
 			// Filter scan using voxel filter
-			double resolution = 0.5;
+			double resolution = 5;
 			pcl::VoxelGrid<PointT> vg;
 			vg.setInputCloud(scanCloud);
 			vg.setLeafSize(resolution, resolution, resolution);
@@ -287,7 +298,12 @@ int main(int argc, char *argv[])
 			vg.filter(*FilterCloud);
 
 			// Find pose transform by using ICP or NDT matching
-			Eigen::Matrix4d pos_transform = select_ndt ? NDT(mapCloud, FilterCloud, pose) : ICP(mapCloud, FilterCloud, pose, 20);
+			pcl::NormalDistributionsTransform<pcl::PointXYZ, pcl::PointXYZ> ndt;
+
+			ndt.setStepSize(1);
+			ndt.setResolution(1);
+			ndt.setInputTarget(mapCloud);
+			Eigen::Matrix4d pos_transform = select_ndt ? NDT(ndt, FilterCloud, pose) : ICP(mapCloud, FilterCloud, pose, 20);
 			pose = getPose(pos_transform);
 
 			// Transform scan so it aligns with ego's actual pose and render that scan
